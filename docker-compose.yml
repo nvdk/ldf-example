@@ -15,6 +15,8 @@ services:
     labels:
       - "logging=true"
     logging: *default-logging
+    environment:
+      STATIC_FOLDERS_REGEX: "^/(assets|font|files|ldf|sitemap.xml)/"
   identifier:
     image: semtech/mu-identifier:1.6.1
     environment:

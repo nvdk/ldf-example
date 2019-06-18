@@ -136,12 +136,39 @@ defmodule Dispatcher do
     Proxy.forward conn, [], "http://sitemap/sitemap.xml"
   end
 
-  match "/lfd/*path" do
-    Proxy.forward conn, path, "http://ldf:3000/"
+  match "/ldf/*path" do
+    headers = conn.req_headers
+
+    forwarded =
+      headers
+      |> List.keyfind("x-forwarded-for", 0, {nil, nil})
+      |> elem(1)
+      |> IO.inspect(label: "Forwarded header value")
+
+    new_headers =
+      headers
+      |> List.keydelete("host", 0)
+      |> put_new_key("Host", forwarded)
+      |> IO.inspect(label: "New headers")
+
+    conn
+    |> Map.put(:req_headers, new_headers)
+    |> Map.put(:host, forwarded)
+    |> Proxy.forward(path, "http://ldf:3000/ldf/")
   end
 
   match _ do
     send_resp( conn, 404, "Route not found.  See config/dispatcher.ex" )
+  end
+
+  def put_new_key( list, key, value ) do
+    # Adds the key/value tuple to the list, unless it is already there
+
+    if List.keymember?( list, key, 0 ) do
+      list
+    else
+      [ { key, value } | list ]
+    end
   end
 
 end

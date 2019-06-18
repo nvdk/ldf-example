@@ -1,12 +1,13 @@
 {
   "title": "Linked Data Fragments server",
+  "baseURL": "/ldf/",
   "datasources": {
     "db": {
       "title": "mandatendatabank",
       "type": "SparqlDatasource",
       "description": "Bestuurseenheden, bestuursorganen, mandaten en mandatarissen van de gemeenten en ocmw's in Vlaanderen.",
       "settings": {
-        "endpoint": "https://database:8890/sparql"
+        "endpoint": "http://database:8890/sparql"
       }
     }
   }

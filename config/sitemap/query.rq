@@ -1,0 +1,14 @@
+PREFIX mandaat: <http://data.vlaanderen.be/ns/mandaat#>
+PREFIX besluit: <http://data.vlaanderen.be/ns/besluit#>
+PREFIX persoon: <http://data.vlaanderen.be/ns/persoon#>
+PREFIX person: <http://www.w3.org/ns/person#>
+PREFIX mu: <http://mu.semte.ch/vocabularies/core/>
+SELECT distinct ?url WHERE {
+?uri a ?type;
+     mu:uuid ?uuid.
+VALUES (?type ?baseURL) {
+ (person:Person "https://mandaten.lokaalbestuur.vlaanderen.be/persoon/")
+ (besluit:Bestuursorgaan "https://mandaten.lokaalbestuur.vlaanderen.be/bestuursorgaan/")
+}
+BIND(IRI(CONCAT(?baseURL,?uuid)) AS ?url)
+}

@@ -76,7 +76,7 @@ services:
     links:
       - database:database
   ldf:
-    image: ldf-server
+    image: linkeddatafragments/server.js:release-v2.2.5
     volumes:
       - ./config/ldf.json:/app/config.json
     command: "/app/config.json"

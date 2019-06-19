@@ -155,7 +155,7 @@ defmodule Dispatcher do
   match "/ldf/*path" do
     forwarded_for_host =
       conn
-      |> Plug.Conn.get_req_header("x-forwarded-for")
+      |> Plug.Conn.get_req_header("x-forwarded-host")
       |> Enum.at(0)
     new_headers =
       conn.req_headers

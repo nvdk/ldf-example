@@ -17,6 +17,8 @@ services:
     logging: *default-logging
     environment:
       STATIC_FOLDERS_REGEX: "^/(assets|font|files|ldf|sitemap.xml)/"
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/conf.d/app.conf
   identifier:
     image: semtech/mu-identifier:1.6.1
     environment:

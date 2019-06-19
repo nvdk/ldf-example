@@ -14,12 +14,13 @@ To add LDF to a linked data stack the following steps were taken:
 
 2. create the proper [configuration](config/ldf.json), note that baseURL was set to `/ldf/`. This needs to correspond to the path used in the dispatcher.
 
-3. add the proper rule to the dispatcher (this snippet overrides the host header on the request, as detailed in the [server.js repository](https://github.com/LinkedDataFragments/Server.js#optional-set-up-a-reverse-proxy)):
+3. Use a custom [nginx.conf](config/nginx.conf) to pass on the original host in the X-Forwarded-Host header.
+4. add the proper rule to the dispatcher (this snippet overrides the host header on the request, as detailed in the [server.js repository](https://github.com/LinkedDataFragments/Server.js#optional-set-up-a-reverse-proxy)):
 ```
   match "/ldf/*path" do
     forwarded_for_host =
       conn
-      |> Plug.Conn.get_req_header("x-forwarded-for")
+      |> Plug.Conn.get_req_header("x-forwarded-host")
       |> Enum.at(0)
     new_headers =
       conn.req_headers
@@ -39,7 +40,7 @@ To also handle the landing page (which runs on /ldf and not /ldf/ ) add an extra
   get "/ldf/" do
     forwarded_for_host =
       conn
-      |> Plug.Conn.get_req_header("x-forwarded-for")
+      |> Plug.Conn.get_req_header("x-forwarded-host")
       |> Enum.at(0)
     new_headers =
       conn.req_headers

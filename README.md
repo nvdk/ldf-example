@@ -21,11 +21,33 @@ To add LDF to a linked data stack the following steps were taken:
       conn
       |> Plug.Conn.get_req_header("x-forwarded-for")
       |> Enum.at(0)
-
+    new_headers =
+      conn.req_headers
+      |> List.keydelete("host", 0)
+      |> put_new_key("Host", forwarded_for_host)
     conn
-    |> Plug.Conn.delete_req_header("host")
-    |> Plug.Conn.put_req_header("host", forwarded_for_host)
+    |> Map.put(:req_headers, new_headers)
     |> Map.put(:host, forwarded_for_host)
     |> Proxy.forward(path, "http://ldf:3000/ldf/")
+  end
+```
+
+To also handle the landing page (which runs on /ldf and not /ldf/ ) add an extra rule:
+
+```
+  # handle landing page of linked data fragments
+  get "/ldf/" do
+    forwarded_for_host =
+      conn
+      |> Plug.Conn.get_req_header("x-forwarded-for")
+      |> Enum.at(0)
+    new_headers =
+      conn.req_headers
+      |> List.keydelete("host", 0)
+      |> put_new_key("Host", forwarded_for_host)
+    conn
+    |> Map.put(:req_headers, new_headers)
+    |> Map.put(:host, forwarded_for_host)
+    |> Proxy.forward([], "http://ldf:3000/ldf")
   end
 ```

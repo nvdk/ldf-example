@@ -136,18 +136,37 @@ defmodule Dispatcher do
     Proxy.forward conn, [], "http://sitemap/sitemap.xml"
   end
 
+  # handle landing page of linked data fragments
+  get "/ldf/" do
+    forwarded_for_host =
+      conn
+      |> Plug.Conn.get_req_header("x-forwarded-for")
+      |> Enum.at(0)
+    new_headers =
+      conn.req_headers
+      |> List.keydelete("host", 0)
+      |> put_new_key("Host", forwarded_for_host)
+    conn
+    |> Map.put(:req_headers, new_headers)
+    |> Map.put(:host, forwarded_for_host)
+    |> Proxy.forward([], "http://ldf:3000/ldf")
+  end
+
   match "/ldf/*path" do
     forwarded_for_host =
       conn
       |> Plug.Conn.get_req_header("x-forwarded-for")
       |> Enum.at(0)
-
+    new_headers =
+      conn.req_headers
+      |> List.keydelete("host", 0)
+      |> put_new_key("Host", forwarded_for_host)
     conn
-    |> Plug.Conn.delete_req_header("host")
-    |> Plug.Conn.put_req_header("host", forwarded_for_host)
+    |> Map.put(:req_headers, new_headers)
     |> Map.put(:host, forwarded_for_host)
     |> Proxy.forward(path, "http://ldf:3000/ldf/")
   end
+
   match _ do
     send_resp( conn, 404, "Route not found.  See config/dispatcher.ex" )
   end
